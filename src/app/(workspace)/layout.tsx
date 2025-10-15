@@ -1,14 +1,14 @@
 import { currentUser } from "@/modules/authentication/actions";
-import Header from "@/modules/layout/components/header";
+import Header from "@/modules/Layout/components/header";
+
 import React from "react";
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
-  const user = currentUser();
+  const user = await currentUser();
   return (
     <>
-      {/* to do : add user props in header user={user} */}
-      
-      <Header />
+      {/* @ts-ignore */}
+      <Header user={user} />
       {/* MAIN */}
       <main className='max-h[calc(100vh-4rem)] h-[calc(100vh-4rem)] flex flex-1 overflow-hidden'>
         <div className='flex h-full w-full'>
