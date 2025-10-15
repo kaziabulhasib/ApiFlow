@@ -3,8 +3,6 @@
 import db from "@/lib/db";
 import { currentUser } from "@/modules/authentication/actions";
 import { MEMBER_ROLE } from "@prisma/client";
-import { error } from "console";
-import { success } from "zod";
 
 export const initializeWorkspace = async () => {
   const user = await currentUser();
@@ -76,7 +74,7 @@ export async function createWorkspaces(name: string) {
       },
     },
   });
-  return { success: true, workspace };
+  return workspace;
 }
 
 export async function getWorkspaceById(id: string) {
@@ -84,5 +82,8 @@ export async function getWorkspaceById(id: string) {
     where: { id },
     include: { members: true },
   });
-  return { success: true, workspace };
+  return workspace;
 }
+
+
+// commit - create server action 

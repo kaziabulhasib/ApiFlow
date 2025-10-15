@@ -81,13 +81,15 @@ model Workspace {
   id          String  @id @default(cuid())
   name        String  @unique
   description String?
-  OwnerId     String
-  owner       User    @relation("UserWorkspaces", fields: [OwnerId], references: [id])
+  ownerId     String
+  owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
   members WorkspaceMember[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+
+  @@unique([name, ownerId])
 }
 
 enum MEMBER_ROLE {
