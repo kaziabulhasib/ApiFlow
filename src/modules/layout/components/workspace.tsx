@@ -1,9 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Hint } from "@/components/ui/hint";
-import { User } from "lucide-react";
+import { useWorkspaces } from "@/modules/workspace/hooks/workspace";
+import { Loader, User } from "lucide-react";
 import React from "react";
 
 const Workspace = () => {
+  const { data: workspaces, isLoading } = useWorkspaces();
+
+  if (isLoading) {
+    return <Loader className='animate-spin text-indigo-400 size-4' />;
+  }
+
+  if (!workspaces || workspaces.length===0) {
+    return <div className="font-semibold text-indigo-400">No workspace Found</div>
+  }
   return (
     <>
       <Hint label='Change Workspace'>
