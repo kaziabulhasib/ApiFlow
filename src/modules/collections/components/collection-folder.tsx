@@ -18,6 +18,8 @@ import {
 import React, { useState } from "react";
 import EditCollectionModal from "./edit-collection";
 import DeleteCollectionModal from "./delete-collection";
+import SaveRequestToCollectionModal from "./add-request-modal";
+import { is } from "date-fns/locale";
 
 interface Props {
   collection: {
@@ -113,7 +115,11 @@ const CollectionFolder = ({ collection }: Props) => {
         collectionId={collection.id}
         initialName={collection.name}
       />
-
+      <SaveRequestToCollectionModal
+      isModalOpen={isAddRequestOpen}
+      setIsModalOpen={setIsAddRequestOpen}
+      collectionId={collection.id}
+      />
       <DeleteCollectionModal
         isModalOpen={isDeleteOpen}
         setIsModalOpen={setIsDeleteOpen}
