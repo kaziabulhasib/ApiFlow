@@ -16,6 +16,8 @@ import {
   Trash,
 } from "lucide-react";
 import React, { useState } from "react";
+import EditCollectionModal from "./edit-collection";
+import DeleteCollectionModal from "./delete-collection";
 
 interface Props {
   collection: {
@@ -104,6 +106,19 @@ const CollectionFolder = ({ collection }: Props) => {
           </div>
         </div>
       </Collapsible>
+      {/* modals */}
+      <EditCollectionModal
+        isModalOpen={isEditOpen}
+        setIsModalOpen={setIsEditOpen}
+        collectionId={collection.id}
+        initialName={collection.name}
+      />
+
+      <DeleteCollectionModal
+        isModalOpen={isDeleteOpen}
+        setIsModalOpen={setIsDeleteOpen}
+        collectionId={collection.id}
+      />
     </>
   );
 };
