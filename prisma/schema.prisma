@@ -84,7 +84,7 @@ model Workspace {
   ownerId     String
   owner       User    @relation("UserWorkspaces", fields: [ownerId], references: [id])
 
-  members WorkspaceMember[]
+  members     WorkspaceMember[]
   collections collection[]
 
   createdAt DateTime @default(now())
@@ -114,12 +114,40 @@ model WorkspaceMember {
 // ---------------collection ---------
 
 model collection {
-  id String @id @default(cuid())
+  id   String @id @default(cuid())
   name String
 
   workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  workspace Workspace @relation(fields: [workspaceId],references: [id], onDelete: Cascade)
+  requests request[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+enum REST_METHOD {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+// ---------request --------
+
+model request {
+  id         String      @id @default(cuid())
+  name       String
+  method     REST_METHOD @default(GET)
+  url        String
+  parameters Json?
+  headers    Json?
+  body       Json?
+  response   Json?
+
+  collectionId String
+  collection   collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
