@@ -1,5 +1,6 @@
 "use server";
 
+import { ChartLegend } from "@/components/ui/chart";
 import db from "@/lib/db";
 import { currentUser } from "@/modules/authentication/actions";
 import { MEMBER_ROLE } from "@prisma/client";
@@ -61,6 +62,7 @@ export async function getWorkspaces() {
 
 export async function createWorkspaces(name: string) {
   const user = await currentUser();
+  console.log("from line 65F", user);
   if (!user) throw new Error("unauthorized");
   const workspace = await db.workspace.create({
     data: {
@@ -77,13 +79,16 @@ export async function createWorkspaces(name: string) {
   return workspace;
 }
 
-export async function getWorkspaceById(id: string) {
+export const getWorkspaceById = async (id: string) => {
+  if (!id) {
+    throw new Error("Workspace ID is missing or undefined");
+  }
+
   const workspace = await db.workspace.findUnique({
     where: { id },
-    include: { members: true },
+    include: {
+      members: true,
+    },
   });
   return workspace;
-}
-
-
-// commit - create server action 
+};
