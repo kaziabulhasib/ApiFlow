@@ -7,6 +7,7 @@ import { Unplug } from "lucide-react";
 import TabBar from "./tab-bar";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import RequestEditors from "./request-editor";
 
 const RequestPlayground = () => {
   const { tabs, activeTabId, addTab } = useRequestPlaygroundStore();
@@ -57,6 +58,9 @@ const RequestPlayground = () => {
   return (
     <div className='flex flex-col h-full'>
       <TabBar />
+      <div className="flex-1 overflow-auto">
+        <RequestEditors/>
+      </div>
     </div>
   );
 };
