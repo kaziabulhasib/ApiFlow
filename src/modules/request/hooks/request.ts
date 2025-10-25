@@ -6,8 +6,11 @@ import {
   saveRequest,
   getallRequestFromCollection,
 } from "../actions";
+import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
 export function useAddRequestToCollection(collectionId: string) {
+  const { updateTabFromSavedRequest, activeTabId } =
+    useRequestPlaygroundStore();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -15,7 +18,9 @@ export function useAddRequestToCollection(collectionId: string) {
       addRequestToCollection(collectionId, value),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
-      console.log(data);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      updateTabFromSavedRequest(activeTabId, data);
     },
   });
 }
@@ -28,13 +33,18 @@ export function useGetallRequestFromCollection(collectionId: string) {
 }
 
 export function useSaveRequest(id: string) {
+  const { updateTabFromSavedRequest, activeTabId } =
+    useRequestPlaygroundStore();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (value: Request) => saveRequest(id, value),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["requests"] });
-      console.log(data)
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      updateTabFromSavedRequest(activeTabId, data);
     },
   });
 }
