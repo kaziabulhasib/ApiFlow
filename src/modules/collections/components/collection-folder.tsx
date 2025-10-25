@@ -179,6 +179,8 @@ const CollectionFolder = ({ collection }: Props) => {
                             <EllipsisVertical className='w-3 h-3 text-zinc-400' />
                           </button>
                         </DropdownMenuTrigger>
+
+                        {/* TO DO : EDIT REQUEST & DELETE REQUEST */}
                         <DropdownMenuContent className='w-32'>
                           <DropdownMenuItem>
                             <Edit className='text-blue-400 mr-2 w-3 h-3' />
