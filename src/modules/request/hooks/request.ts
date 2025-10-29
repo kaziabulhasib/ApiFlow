@@ -5,6 +5,7 @@ import {
   addRequestToCollection,
   saveRequest,
   getallRequestFromCollection,
+  run,
 } from "../actions";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
@@ -45,6 +46,20 @@ export function useSaveRequest(id: string) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       updateTabFromSavedRequest(activeTabId, data);
+    },
+  });
+}
+
+export function useRunRequest(requestId: string) {
+  const queryClient = useQueryClient();
+  const { setResponseViewerData } = useRequestPlaygroundStore();
+  return useMutation({
+    mutationFn: async () => run(requestId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //  @ts-ignore
+      setResponseViewerData(data);
     },
   });
 }

@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import React from "react";
 import { RequestTab } from "../store/useRequestStore";
 
 import {
@@ -10,8 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { useRunRequest } from "../hooks/request";
+import { toast } from "sonner";
 
 interface Props {
   tab: RequestTab;
@@ -19,18 +22,28 @@ interface Props {
 }
 
 const RequestBar = ({ tab, updateTab }: Props) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  const { mutateAsync, isPending, isError } = useRunRequest(tab?.requestId!);
   const requestColorMap: Record<string, string> = {
     GET: "text-green-500",
-    POST: "text-indigo-500",
+    POST: "text-blue-500",
     PUT: "text-yellow-500",
     DELETE: "text-red-500",
-    // PATCH: "text-orange-500",
   };
 
-  const onSendRequest=()=>{}
+  const onSendRequest = async () => {
+    try {
+      const res = await mutateAsync();
+
+      toast.success("Request sent successfully!");
+    } catch (error) {
+      toast.error("Failed to send request.");
+    }
+  };
+
   return (
-    <div className='flex justify-between items-center bg-zinc-900 rounded-md px-2 py-2 w-full'>
-      <div className='flex items-center gap-2 flex-1'>
+    <div className='flex flex-row items-center justify-between bg-zinc-900 rounded-md px-2 py-2 w-full'>
+      <div className='flex flex-row items-center gap-2 flex-1'>
         <Select
           value={tab.method}
           onValueChange={(value) => updateTab(tab.id, { method: value })}>
@@ -65,15 +78,15 @@ const RequestBar = ({ tab, updateTab }: Props) => {
           className='flex-1'
         />
       </div>
+
       <Button
-      type="submit"
-      onClick={onSendRequest}
-      disabled={!tab.url}
-      className="ml-2 text-white font-bold  bg-indigo-500 hover:bg-indigo-600"
-      >
-    <Send  className="mr-2"/>
-    Send
-    </Button>
+        type='submit'
+        onClick={onSendRequest}
+        disabled={isPending || !tab.url}
+        className='ml-2 text-white  font-bold bg-indigo-500 hover:bg-indigo-600'>
+        <Send className='mr-2' />
+        Send
+      </Button>
     </div>
   );
 };

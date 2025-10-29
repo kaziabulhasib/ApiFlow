@@ -120,7 +120,7 @@ model collection {
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  requests request[]
+  requests Request[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -136,7 +136,7 @@ enum REST_METHOD {
 
 // ---------request --------
 
-model request {
+model Request {
   id         String      @id @default(cuid())
   name       String
   method     REST_METHOD @default(GET)
@@ -149,6 +149,25 @@ model request {
   collectionId String
   collection   collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
+  runs RequestRun[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model RequestRun {
+  id String @id @default(cuid())
+
+  requestId String
+  request Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  status Int
+  statusText String?
+
+  headers Json?
+  body Json?
+  durationMs Int?
+
+  createdAt DateTime @default(now())  
+  
 }
