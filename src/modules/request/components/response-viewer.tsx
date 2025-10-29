@@ -319,8 +319,9 @@ const ResponseViewer = ({ responseData }: Props) => {
                             variant='ghost'
                             className='text-gray-400 hover:text-white ml-2'
                             onClick={() => copyToClipboard(`${key}: ${value}`)}>
-                            <Copy className='w-3 h-3' />
+                            <Copy className='w-3 h-3 ' />
                           </Button>
+                        
                         </div>
                       ))}
                     </div>
