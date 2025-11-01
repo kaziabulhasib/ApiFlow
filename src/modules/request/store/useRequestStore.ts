@@ -28,6 +28,7 @@ interface Result {
   statusText?: string;
   duration?: number;
   size?: number;
+  data ?: any;
 }
 
 export interface ResponseData {
@@ -48,7 +49,7 @@ export type RequestTab = {
   requestId?: string;
   collectionId?: string;
   workspaceId?: string;
-  reposneViewerData: ResponseData | null;
+  responseViewerData: ResponseData | null;
   setResponseViewerData: (data: ResponseData) => void;
 };
 
@@ -69,8 +70,8 @@ type PlaygroundState = {
     setResponseViewerData: (data: ResponseData) => void;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
+
+
 export const useRequestPlaygroundStore = create<PlaygroundState>((set) => ({
   responseViewerData : null,
   setResponseViewerData: (data) => set({ responseViewerData: data }),

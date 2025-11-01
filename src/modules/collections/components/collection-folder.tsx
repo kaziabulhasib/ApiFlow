@@ -21,7 +21,7 @@ import EditCollectionModal from "./edit-collection";
 import DeleteCollectionModal from "./delete-collection";
 import SaveRequestToCollectionModal from "./add-request-modal";
 import { is } from "date-fns/locale";
-import { useGetallRequestFromCollection } from "@/modules/request/hooks/request";
+import { useGetAllRequestFromCollection } from "@/modules/request/hooks/request";
 import { REST_METHOD } from "@prisma/client";
 import { CollapsibleContent } from "@/components/ui/collapsible";
 import { useRequestPlaygroundStore } from "@/modules/request/store/useRequestStore";
@@ -45,7 +45,7 @@ const CollectionFolder = ({ collection }: Props) => {
     data: requestData,
     isPending,
     isError,
-  } = useGetallRequestFromCollection(collection.id);
+  } = useGetAllRequestFromCollection(collection.id);
 
   const {openRequestTab}=useRequestPlaygroundStore()
 
@@ -154,7 +154,7 @@ const CollectionFolder = ({ collection }: Props) => {
                     className='flex items-center justify-between py-2 px-3 hover:bg-zinc-900/50 rounded-md cursor-pointer group transition-colors'>
                     <div className='flex items-center space-x-3 flex-1'>
                       <div className='flex items-center space-x-2'>
-                        {/* @ts-expect-error */}
+                        
                         <span
                           className={`text-xs font-bold px-2 py-1 rounded ${
                             requestColorMap[request.method]

@@ -97,15 +97,13 @@ const ResponseViewer = ({ responseData }: Props) => {
   }
 
   const status: number | undefined =
-    responseData.result?.status ?? responseData.requestRun?.status;
+    responseData?.result?.status ?? responseData.requestRun?.status;
   const statusText: string | undefined =
     responseData.result?.statusText ?? responseData.requestRun?.statusText;
   const duration: number | undefined =
     responseData.result?.duration ?? responseData.requestRun?.durationMs;
   const size: number | undefined = responseData.result?.size;
   const rawBody = responseData.requestRun?.body;
-
-
 
   return (
     <div className='w-full bg-zinc-950 text-white p-6'>
@@ -319,9 +317,10 @@ const ResponseViewer = ({ responseData }: Props) => {
                             variant='ghost'
                             className='text-gray-400 hover:text-white ml-2'
                             onClick={() => copyToClipboard(`${key}: ${value}`)}>
-                            <Copy className='w-3 h-3 ' />
+                            <Copy className='w-3 h-3 pointer ' />
+
+                            
                           </Button>
-                        
                         </div>
                       ))}
                     </div>

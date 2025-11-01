@@ -1,19 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import {
-  type Request,
   addRequestToCollection,
-  saveRequest,
-  getallRequestFromCollection,
+  getAllRequestFromCollection,
+  Request,
   run,
+  saveRequest,
 } from "../actions";
 import { useRequestPlaygroundStore } from "../store/useRequestStore";
 
 export function useAddRequestToCollection(collectionId: string) {
+  const queryClient = useQueryClient();
   const { updateTabFromSavedRequest, activeTabId } =
     useRequestPlaygroundStore();
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (value: Request) =>
       addRequestToCollection(collectionId, value),
@@ -21,15 +19,15 @@ export function useAddRequestToCollection(collectionId: string) {
       queryClient.invalidateQueries({ queryKey: ["requests", collectionId] });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      updateTabFromSavedRequest(activeTabId, data);
+      updateTabFromSavedRequest(activeTabId!, data);
     },
   });
 }
 
-export function useGetallRequestFromCollection(collectionId: string) {
+export function useGetAllRequestFromCollection(collectionId: string) {
   return useQuery({
     queryKey: ["requests", collectionId],
-    queryFn: async () => getallRequestFromCollection(collectionId),
+    queryFn: async () => getAllRequestFromCollection(collectionId),
   });
 }
 
@@ -45,20 +43,21 @@ export function useSaveRequest(id: string) {
 
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      updateTabFromSavedRequest(activeTabId, data);
+      updateTabFromSavedRequest(activeTabId!, data);
     },
   });
 }
 
 export function useRunRequest(requestId: string) {
   const queryClient = useQueryClient();
+
   const { setResponseViewerData } = useRequestPlaygroundStore();
   return useMutation({
-    mutationFn: async () => run(requestId),
+    mutationFn: async () => await run(requestId),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["requests"] });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //  @ts-ignore
+      // @ts-ignore
       setResponseViewerData(data);
     },
   });

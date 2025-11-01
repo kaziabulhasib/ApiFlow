@@ -1,16 +1,14 @@
 "use server";
 
 import db from "@/lib/db";
-
 import { REST_METHOD } from "@prisma/client";
-import axios, { AxiosRequestConfig } from "axios";
 
+import axios, { AxiosRequestConfig } from "axios";
 
 export type Request = {
   name: string;
   method: REST_METHOD;
   url: string;
-
   body?: string;
   headers?: string;
   parameters?: string;
@@ -36,6 +34,7 @@ export const addRequestToCollection = async (
 };
 
 export const saveRequest = async (id: string, value: Request) => {
+  console.log(value, id);
   const request = await db.request.update({
     where: {
       id: id,
@@ -53,9 +52,11 @@ export const saveRequest = async (id: string, value: Request) => {
   return request;
 };
 
-export const getallRequestFromCollection = async (collectionId: string) => {
+export const getAllRequestFromCollection = async (collectionId: string) => {
   const requests = await db.request.findMany({
-    where: { collectionId },
+    where: {
+      collectionId,
+    },
   });
   return requests;
 };
@@ -65,7 +66,7 @@ export async function sendRequest(req: {
   url: string;
   headers?: Record<string, string>;
   params?: Record<string, string>;
-  body?: "string";
+  body?: any;
 }) {
   const config: AxiosRequestConfig = {
     method: req.method,
@@ -73,7 +74,7 @@ export async function sendRequest(req: {
     headers: req.headers,
     params: req.params,
     data: req.body,
-    validateStatus: () => true, 
+    validateStatus: () => true,
   };
 
   const start = performance.now();
@@ -86,16 +87,17 @@ export async function sendRequest(req: {
       res.headers["content-length"] ||
       new TextEncoder().encode(JSON.stringify(res.data)).length;
 
-    console.log(res.data);
+    // console.log(res.data);
+
     return {
-      status: res.data.status,
-      statusText: res.data.statusText,
-      headers: res.data.headers,
+      status: res.status,
+      statusText: res.statusText,
+      headers: Object.fromEntries(Object.entries(res.headers)),
       data: res.data,
       duration: Math.round(duration),
       size,
     };
-  } catch (error: Error ) {
+  } catch (error: any) {
     const end = performance.now();
     return {
       error: error.message,
@@ -107,12 +109,11 @@ export async function sendRequest(req: {
 export async function run(requestId: string) {
   try {
     const request = await db.request.findUnique({
-      where: {
-        id: requestId,
-      },
+      where: { id: requestId },
     });
+
     if (!request) {
-      throw new Error(`Request with id  ${requestId} not found`);
+      throw new Error(`Request with id ${requestId} not found`);
     }
 
     const requestConfig = {
@@ -135,12 +136,11 @@ export async function run(requestId: string) {
           ? typeof result.data === "string"
             ? result.data
             : JSON.stringify(result.data)
-          : "",
+          : null,
         durationMs: result.duration || 0,
       },
     });
 
-    // Update request with latest response if successful
     if (result.data && !result.error) {
       await db.request.update({
         where: { id: request.id },
@@ -150,12 +150,13 @@ export async function run(requestId: string) {
         },
       });
     }
+
     return {
       success: true,
       requestRun,
       result,
     };
-  } catch (error: Error) {
+  } catch (error: any) {
     try {
       const failedRun = await db.requestRun.create({
         data: {
@@ -167,6 +168,7 @@ export async function run(requestId: string) {
           durationMs: 0,
         },
       });
+
       return {
         success: false,
         error: error.message,
@@ -175,7 +177,86 @@ export async function run(requestId: string) {
     } catch (dbError) {
       return {
         success: false,
-        error: `Request failed: ${error.message}. DB saved failed: ${
+        error: `Request failed: ${error.message}. DB save failed: ${
+          (dbError as Error).message
+        }`,
+      };
+    }
+  }
+}
+
+export async function runDirect(requestData: {
+  id: string;
+  method: string;
+  url: string;
+  headers?: Record<string, string>;
+  parameters?: Record<string, any>;
+  body?: any;
+}) {
+  try {
+    const requestConfig = {
+      method: requestData.method,
+      url: requestData.url,
+      headers: requestData.headers,
+      params: requestData.parameters,
+      body: requestData.body,
+    };
+
+    const result = await sendRequest(requestConfig);
+
+    const requestRun = await db.requestRun.create({
+      data: {
+        requestId: requestData.id,
+        status: result.status || 0,
+        statusText: result.statusText || (result.error ? "Error" : null),
+        headers: result.headers || "",
+        body: result.data
+          ? typeof result.data === "string"
+            ? result.data
+            : JSON.stringify(result.data)
+          : "",
+        durationMs: result.duration || 0,
+      },
+    });
+
+    // Update request response
+    if (result.data && !result.error) {
+      await db.request.update({
+        where: { id: requestData.id },
+        data: {
+          response: result.data,
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    return {
+      success: true,
+      requestRun,
+      result,
+    };
+  } catch (error: any) {
+    try {
+      const failedRun = await db.requestRun.create({
+        data: {
+          requestId: requestData.id,
+          status: 0,
+          statusText: "Failed",
+          headers: "",
+          body: error.message,
+          durationMs: 0,
+        },
+      });
+
+      return {
+        success: false,
+        error: error.message,
+        requestRun: failedRun,
+      };
+    } catch (dbError) {
+      return {
+        success: false,
+        error: `Request failed: ${error.message}. DB save failed: ${
           (dbError as Error).message
         }`,
       };
